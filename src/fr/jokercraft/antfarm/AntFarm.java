@@ -4,6 +4,7 @@
 package fr.jokercraft.antfarm;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,14 +16,14 @@ import javax.swing.JPanel;
  * @author Romain Clarivet
  *
  */
-public class AntFarm extends JPanel implements Environment
- {
+public class AntFarm extends JPanel implements Environment {
+	
+  private final Dimension dimensions;
+  private final ArrayList<Agent> agentList;
+  private final Random generator;
+  
+ 
   private int scale = 16;
-  
-  private Dimension dimensions;
-  private ArrayList<Agent> agentList;
-  private Random generator;
-  
   
   public AntFarm() {
    
@@ -31,6 +32,7 @@ public class AntFarm extends JPanel implements Environment
    agentList = new ArrayList<Agent>();
    
    dimensions = new Dimension(32, 24);
+
    
    super.setPreferredSize(new Dimension(dimensions.width*scale, dimensions.height*scale));
    
@@ -121,7 +123,38 @@ public class AntFarm extends JPanel implements Environment
   public void reset() {
 	
    	this.agentList.clear();
+   	int randomX, randomY;
+   	
+   	for(RessourceType type : RessourceType.values()) {
+   	   	for(int i=0;i<50;i++) {
+   	   		
+   	   		randomX = this.generator.nextInt((this.dimensions.width+1) * this.scale);
+   	   		randomY = this.generator.nextInt((this.dimensions.height+1) * this.scale);
+   	   		
+   	   		Point newPosition = new Point(randomX, randomY);
+   	   		
+   	   		if(getAgent(newPosition) != null) { 
+   	   			i--;
+   	   			continue;
+   	   		}
+   	   		
+   	   		this.agentList.add(new Ressource(newPosition, type));
+   	   	}
+   	}
+   	
+
+   	
     super.updateUI();
    }
 
+  
+  public void paint(Graphics g) {
+	  
+	int windowWidth  = this.dimensions.width * this.scale;
+	int windowHeight = this.dimensions.height * this.scale;
+	  
+	g.clearRect(0, 0, windowWidth, windowHeight);
+	  
+	for(Agent agent : this.agentList) agent.drawIt(g, this.scale);
+  }
  }
